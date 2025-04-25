@@ -68,6 +68,20 @@ if __name__ == '__main__':
     # show_image(raw_data, points=centroids)
 
     # ===== Create Light-Field Array
-    a_random_centroid_id = 970
-    print(centroids[a_random_centroid_id].astype(int)-centroids[a_random_centroid_id])
-    show_image(raw_data[int(centroids[a_random_centroid_id][0])-20:int(centroids[a_random_centroid_id][0])+21, int(centroids[a_random_centroid_id][1])-20:int(centroids[a_random_centroid_id][1])+21], points=np.array([[20, 20]]))
+    a_random_centroid_id = 960
+    exact_centroid = -centroids[a_random_centroid_id].astype(int)+centroids[a_random_centroid_id]+[20, 20]
+    distance_from_centroid = -centroids[a_random_centroid_id].astype(int)+centroids[a_random_centroid_id]
+    print(distance_from_centroid)
+    single_uv = raw_data[int(centroids[a_random_centroid_id][0])-20:int(centroids[a_random_centroid_id][0])+21, int(centroids[a_random_centroid_id][1])-20:int(centroids[a_random_centroid_id][1])+21]
+    show_image(single_uv, points=np.array([[20, 20], exact_centroid]))
+    interpolated_uv = np.zeros_like(single_uv)
+    old_u = np.arange(-20, 21)
+    old_v = np.arange(-20, 21)
+    new_u = old_u + distance_from_centroid[0]
+    new_v = old_v + distance_from_centroid[1]
+    new_u_grid, new_v_grid = np.meshgrid(new_u, new_v)
+    points = (old_u, old_v)
+
+    from scipy.interpolate import interpn
+    print(single_uv[21, 21])
+    show_image(interpn(points, single_uv, (new_v_grid, new_u_grid), bounds_error=False, fill_value=None))
